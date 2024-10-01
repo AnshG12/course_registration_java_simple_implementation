@@ -12,6 +12,7 @@ public class Course {
     private String syllabus= null;
     private int EnrollmentLimit=500;
     private static boolean drop=true;
+    private List<feedback<?>> feedbackList;
 
     public Course(String code, String title, int credits ,List<Course> prerequisites,int semester) {
         this.code = code;
@@ -19,6 +20,7 @@ public class Course {
         this.credits = credits;
         this.enrolledStudents = new ArrayList<>();
         this.prerequisites = new ArrayList<>();
+        this.feedbackList = new ArrayList<>();
         this.semester = semester;
         this.prerequisites=prerequisites;
         if(credits==4){
@@ -71,12 +73,9 @@ public class Course {
     public void setCredits(int credits) {
         this.credits = credits;
     }
-
     public List<Course> getPrerequisites() {
         return prerequisites;
     }
-
-
     public String getSyllabus() {
             return syllabus;
     }
@@ -86,13 +85,21 @@ public class Course {
     public int getEnrollmentLimit() {
         return EnrollmentLimit;
     }
-
     public void setEnrollmentLimit(int enrollmentLimit) {
         this.EnrollmentLimit = enrollmentLimit;
     }
-
     public List<Student> getEnrolledStudents() {
         return enrolledStudents;
+    }
+    public void add_feedback(feedback<?> feedback) {
+        feedbackList.add(feedback);
+    }
+    public void viewCourseFeedback() {
+        System.out.println("Feedback for Course: " + this.courseName);
+        for (feedback<?> feedback : feedbackList) {
+                System.out.println(feedback);
+            System.out.println("-".repeat(20));
+        }
     }
 
     @Override

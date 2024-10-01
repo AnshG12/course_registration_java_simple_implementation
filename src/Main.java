@@ -1,178 +1,228 @@
 import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
+
 public class Main {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        List<Course> course_list = new ArrayList<Course>();
-        List<Complaint> complaints = new ArrayList<Complaint>();
-        List<Student> studentList = new ArrayList<Student>();
-        List<Professor> professorList = new ArrayList<Professor>();
-        List<Administrator> adminList = new ArrayList<Administrator>();
-        List<List<Course>> Schedule= new ArrayList<>();
-        while (true) {
-            System.out.println("Welcome to the University Course Registration System");
-            System.out.println("1. Login as Student\n2. Login as Professor\n3. Login as Administrator\n4. Exit");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-// Student login and menu
-            if (choice == 1) {
-                Student student = loginAsStudent(scanner, studentList);
-                if(student != null) {
-                    studentMenu(student, course_list, complaints);
-                }
-            }
-// Professor login and menu
-            else if (choice == 2) {
-                Professor professor = loginAsProfessor(scanner, professorList);
-                if(professor != null) {
-                    professorMenu(professor, course_list);
-                }
-            }
-// Admin login and menu
-            else if (choice == 3) {
-                Administrator admin= loginAsAdministrator(scanner, adminList);
-                adminMenu(admin, course_list, complaints, professorList,studentList,Schedule);
-            }
-//EXIT
-            else if (choice == 4) {
-                System.out.println("Exiting the system. Goodbye!");
-                break;
-            }
-            else{
-                System.out.println("Please enter a valid choice");
-            }
+    public static class InvalidLoginException extends Exception {
+        public InvalidLoginException(String message) {
+            super(message);
         }
     }
-// LOGIN Function FOR STUDENT
-    private static Student loginAsStudent(Scanner scanner, List<Student> EnrolledStudents) {
-        while (true) {
-            System.out.println("1. Log In\n2. Sign Up");
-            int logInChoice = scanner.nextInt();
-            scanner.nextLine();
-// Login for student
-            if (logInChoice == 1) {
-                System.out.println("Enter your email: ");
-                String studentEmail = scanner.nextLine();
-                System.out.println("Enter your password: ");
-                String studentPassword = scanner.nextLine();
+    public static void main(String[] args) throws CourseFullException {
+//        Scanner scanner = new Scanner(System.in);
+//        List<Course> course_list = new ArrayList<Course>();
+//        List<Complaint> complaints = new ArrayList<Complaint>();
+//        List<Student> studentList = new ArrayList<Student>();
+//        List<Professor> professorList = new ArrayList<Professor>();
+//        List<Administrator> adminList = new ArrayList<Administrator>();
+//        List<List<Course>> Schedule= new ArrayList<>();
+//        while (true) {
+//            System.out.println("Welcome to the University Course Registration System");
+//            System.out.println("1. Login as Student\n2. Login as Professor\n3. Login as Administrator\n4. Exit");
+//            int choice = scanner.nextInt();
+//            scanner.nextLine();
+//// Student login and menu
+//            if (choice == 1) {
+//                Student student = loginAsStudent(scanner, studentList);
+//                if(student != null) {
+//                    studentMenu(student, course_list, complaints);
+//                }
+//            }
+//// Professor login and menu
+//            else if (choice == 2) {
+//                Professor professor = loginAsProfessor(scanner, professorList);
+//                if(professor != null) {
+//                    professorMenu(professor, course_list);
+//                }
+//            }
+//// Admin login and menu
+//            else if (choice == 3) {
+//                Administrator admin= loginAsAdministrator(scanner, adminList);
+//                adminMenu(admin, course_list, complaints, professorList,studentList,Schedule);
+//            }
+////EXIT
+//            else if (choice == 4) {
+//                System.out.println("Exiting the system. Goodbye!");
+//                break;
+//            }
+//            else{
+//                System.out.println("Please enter a valid choice");
+//            }
+//        }
 
-// Check if the student is already enrolled
-                for (Student student : EnrolledStudents) {
-                    if (student.getEmail().equals(studentEmail) && student.checkPassword(studentPassword)) {
-                        System.out.println("Login successful!");
-                        return student;  // Return the logged-in student
-                    }
-                }
-                System.out.println("Invalid email or password. Please try again.");
-            }
-// Sign-Up for student
-            else if (logInChoice == 2) {
-                System.out.println("Enter your email to sign up: ");
-                String newStudentEmail = scanner.nextLine();
-                boolean exists = false;
-                for (Student student : EnrolledStudents) {
-                    if (student.getEmail().equals(newStudentEmail)) {
-                        exists = true;
-                        System.out.println("Try with unregistered email id");
+            Scanner scanner = new Scanner(System.in);
+            List<Course> course_list = new ArrayList<>();
+            List<Complaint> complaints = new ArrayList<>();
+            List<Student> studentList = new ArrayList<>();
+            List<Professor> professorList = new ArrayList<>();
+            List<Administrator> adminList = new ArrayList<>();
+            List<List<Course>> Schedule = new ArrayList<>();
+            while (true) {
+                System.out.println("Welcome to the University Course Registration System");
+                System.out.println("1. Login as Student\n2. Login as Professor\n3. Login as Administrator\n4. Exit");
+                int choice = scanner.nextInt();
+                scanner.nextLine();
+                try {
+                    if (choice == 1) {
+                        Student student = loginAsStudent(scanner, studentList);
+                        studentMenu(student, course_list, complaints);
+
+                    } else if (choice == 2) {
+                        Professor professor = loginAsProfessor(scanner, professorList);
+                        if (professor != null) {
+                            professorMenu(professor, course_list);
+                        }
+                    } else if (choice == 3) {
+                        Administrator admin = loginAsAdministrator(scanner, adminList);
+                        adminMenu(admin, course_list, complaints, professorList, studentList, Schedule);
+                    } else if (choice == 4) {
+                        System.out.println("Exiting the system. Goodbye!");
                         break;
+                    } else {
+                        System.out.println("Please enter a valid choice");
                     }
+                } catch (InvalidLoginException e) {
+                    System.out.println(e.getMessage());
+                } catch (DropDeadlinePassedException e) {
+                    throw new RuntimeException(e);
                 }
-// Check if the student already exists
-                if (exists) {
+            }
+    }
+// LOGIN Function FOR STUDENT
+private static Student loginAsStudent(Scanner scanner, List<Student> EnrolledStudents) throws InvalidLoginException {
+    while (true) {
+        System.out.println("1. Log In\n2. Sign Up");
+        int logInChoice = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
 
-                    System.out.println("This email is already registered. Try logging in.");
-                    return null;
+        if (logInChoice == 1) {
+            // Log in logic
+            System.out.println("Enter your email: ");
+            String studentEmail = scanner.nextLine();
+            System.out.println("Enter your password: ");
+            String studentPassword = scanner.nextLine();
+
+            for (Student student : EnrolledStudents) {
+                if (student.getEmail().equals(studentEmail) && student.checkPassword(studentPassword)) {
+                    System.out.println("Login successful!");
+                    return student;
                 }
+            }
+
+            throw new InvalidLoginException("Invalid email or password. Please try again.");
+
+        } else if (logInChoice == 2) {
+            // Sign up logic
+            System.out.println("Enter your email to sign up: ");
+            String newStudentEmail = scanner.nextLine();
+
+            boolean exists = false;
+            for (Student student : EnrolledStudents) {
+                if (student.getEmail().equals(newStudentEmail)) {
+                    exists = true;
+                    break; // Email already exists
+                }
+            }
+
+            if (exists) {
+                System.out.println("This email is already registered. Try logging in.");
+            } else {
                 System.out.println("Create a password: ");
                 String newStudentPassword = scanner.nextLine();
                 Student newStudent = new Student(newStudentEmail, newStudentPassword);
-                EnrolledStudents.add(newStudent);  // Add the new student to the list
+                EnrolledStudents.add(newStudent);
                 System.out.println("Sign-up successful! You can now log in.");
                 return newStudent;
-            } else {
-                System.out.println("Invalid choice. Please try again.");
-                break;
             }
+
+        } else {
+            // Handle invalid choices
+            System.out.println("Invalid choice. Please enter 1 to log in or 2 to sign up.");
         }
-        return null;
     }
+}
+
 // LOGIN Function FOR Professor
-    private static Professor loginAsProfessor(Scanner scanner, List<Professor> registeredProfessors) {
-        while (true) {
-            System.out.println("1. Log In\n2. Sign Up");
-            int logInChoice = scanner.nextInt();
-            scanner.nextLine();  // Consume newline
-            if (logInChoice == 1) {  // Login
-                System.out.println("Enter your email: ");
-                String professorEmail = scanner.nextLine();
-                System.out.println("Enter your password: ");
-                String professorPassword = scanner.nextLine();
-
-// Check if the professor is already registered
-                for (Professor professor : registeredProfessors) {
-                    if (professor.getEmail().equals(professorEmail) && professor.checkPassword(professorPassword)) {
-                        System.out.println("Login successful!");
-                        return professor;  // Return the logged-in professor
-                    }
+private static Professor loginAsProfessor(Scanner scanner, List<Professor> registeredProfessors) throws InvalidLoginException {
+    while (true) {
+        System.out.println("1. Log In\n2. Sign Up");
+        int logInChoice = scanner.nextInt();
+        scanner.nextLine();
+        if (logInChoice == 1) {
+            System.out.println("Enter your email: ");
+            String professorEmail = scanner.nextLine();
+            System.out.println("Enter your password: ");
+            String professorPassword = scanner.nextLine();
+            for (Professor professor : registeredProfessors) {
+                if (professor.getEmail().equals(professorEmail) && professor.checkPassword(professorPassword)) {
+                    System.out.println("Login successful!");
+                    return professor;
                 }
-                System.out.println("Invalid email or password. Please try again.");
-            } else if (logInChoice == 2) {  // Sign-Up
-                System.out.println("Enter your email to sign up: ");
-                String newProfessorEmail = scanner.nextLine();
-                boolean exists = false;
-                for (Professor professor : registeredProfessors) {
-                    if (professor.getEmail().equals(newProfessorEmail)) {
-                        exists = true;
-                        System.out.println("This email is already registered. Try logging in with a different email.");
-                        break;
-                    }
-                }
-// Check if the professor already exists
-                if (!exists) {
-                    System.out.println("Create a password: ");
-                    String newProfessorPassword = scanner.nextLine();
-// Create a new professor and add to the list
-                    Professor newProfessor = new Professor(newProfessorEmail, newProfessorPassword);
-                    registeredProfessors.add(newProfessor);  // Add the new professor to the list
-                    System.out.println("Sign-up successful! You can now log in.");
-                    return newProfessor;  // Return the newly signed-up professor
-                }
-            } else {
-                System.out.println("Invalid choice. Please try again.");
-                break;
             }
+            throw new InvalidLoginException("Invalid email or password. Please try again.");
+        } else if (logInChoice == 2) {
+            System.out.println("Enter your email to sign up: ");
+            String newProfessorEmail = scanner.nextLine();
+            boolean exists = false;
+            for (Professor professor : registeredProfessors) {
+                if (professor.getEmail().equals(newProfessorEmail)) {
+                    exists = true;
+                    System.out.println("This email is already registered. Try logging in with a different email.");
+                    break;
+                }
+            }
+            if (!exists) {
+                System.out.println("Create a password: ");
+                String newProfessorPassword = scanner.nextLine();
+                Professor newProfessor = new Professor(newProfessorEmail, newProfessorPassword);
+                registeredProfessors.add(newProfessor);
+                System.out.println("Sign-up successful! You can now log in.");
+                return newProfessor;
+            }
+        } else {
+            System.out.println("Invalid choice. Please try again.");
+            break;
         }
-        return null;
     }
+    return null;
+}
 // LOGIN Function FOR ADMIN
-    private static Administrator loginAsAdministrator(Scanner scanner, List<Administrator> registeredAdministrators) {
-        while (true) {
-        System.out.println("Enter your email: ");
-        String adminEmail = scanner.nextLine();
-        System.out.println("Enter your password: ");
-        String adminPassword = scanner.nextLine();
-// Check if the admin is already registered
-        for (Administrator admins : registeredAdministrators) {
-            if (admins.getEmail().equals(adminEmail) && admins.checkPassword(adminPassword)) {
+private static Administrator loginAsAdministrator(Scanner scanner, List<Administrator> registeredAdministrators) throws InvalidLoginException {
+    System.out.println("Enter your email: ");
+    String adminEmail = scanner.nextLine();
+    System.out.println("Enter your password: ");
+    String adminPassword = scanner.nextLine();
+
+    // Loop through the list of registered administrators
+    for (Administrator admin : registeredAdministrators) {
+        if (admin.getEmail().equals(adminEmail)) {
+            // Check password for the found administrator
+            if (admin.checkPassword(adminPassword)) {
                 System.out.println("Login successful!");
-                return admins;  // Return the logged-in admin
+                return admin;
+            } else {
+                throw new InvalidLoginException("Invalid password. Please try again.");
             }
         }
-        Administrator admins = new Administrator(adminEmail);
-        if (admins.checkPassword(adminPassword)) {
-            registeredAdministrators.add(admins);
-            System.out.println("Login successful!");
-             // Return the logged-in admin
-            return admins;
-        }
-        else{
-            System.out.println("Invalid password. Please try again.");
-        }
-        }
-    }
 
-    private static void studentMenu(Student student, List<Course> courses, List<Complaint> complaints) {
+    }
+    Administrator admins = new Administrator(adminEmail);
+    if (admins.checkPassword(adminPassword)) {
+        registeredAdministrators.add(admins);
+        System.out.println("Login successful!");
+        // Return the logged-in admin
+        return admins;
+    }
+    else{
+        throw new InvalidLoginException("Invalid password. Please try again.");
+    }
+    // If the administrator doesn't exist, you can choose what to do:
+    // Either prompt the user to register or throw an exception.
+
+}
+
+
+    private static void studentMenu(Student student, List<Course> courses, List<Complaint> complaints) throws CourseFullException, DropDeadlinePassedException {
         Scanner scanner = new Scanner(System.in);
         boolean run=true;
         while (run) {
@@ -202,21 +252,43 @@ public class Main {
                     student.Academic_Progress();
                     break;
                 case 5:
+                    System.out.println("adding course feedback...");
+// Implement the method to add course feedback
+                    System.out.println("Enter course code for feedback: ");
+                    String courseCode = scanner.nextLine();
+
+                    System.out.println("Would you like to provide a rating (1-5) or a comment? (Enter 'rating' or 'comment')");
+                    String feedbackType = scanner.nextLine();
+
+                    if (feedbackType.equalsIgnoreCase("rating")) {
+                        System.out.println("Enter your rating (1-5): ");
+                        int rating = scanner.nextInt();
+                        student.submitFeedback(courseCode, rating);
+
+                    } else if (feedbackType.equalsIgnoreCase("comment")) {
+                        System.out.println("Enter your comment: ");
+                        scanner.nextLine();  // consume the newline character
+                        String comment = scanner.nextLine();
+                        student.submitFeedback(courseCode, comment);
+
+                    }break;
+
+                case 6:
                     System.out.println("Submitting a Complaint...");
 // Implement the method to submit a complaint
                     student.Submit_complaint(complaints,courses);
                     break;
-                case 6:
+                case 7:
                     System.out.println("Viewing Complaint Box...");
 // Implement the method to view complaints
                     student.view_complaint_status();
                     break;
-                case 7:
+                case 8:
                     System.out.println("Changing Password...\nEnter the new password below: ");
 // Implement the method to change password
                     student.setPassword(scanner.nextLine());
                     break;
-                case 8:
+                case 9:
                     System.out.println("Logging Out...");
                     run = false;
                     break;

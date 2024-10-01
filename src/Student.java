@@ -2,6 +2,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+class CreditLimitExceededException extends Exception {
+    public CreditLimitExceededException(String message) {
+        super(message);
+    }
+}
+class PrerequisitesNotMetException extends Exception {
+    public PrerequisitesNotMetException(String message) {
+        super(message);
+    }
+}
+class DropDeadlinePassedException extends Exception {
+    public DropDeadlinePassedException(String message) {
+        super(message);
+    }
+}
 public class Student extends User implements View{
     private int semester=1;
     private float cgpa;
@@ -12,12 +27,12 @@ public class Student extends User implements View{
 
 
 
+
     public Student(String email, String password) {
         super(email, password);
         this.registeredCourses = new ArrayList<>();
         this.grades_registeredCourses=new ArrayList<>();
         this.registeredComplaints   = new ArrayList<>();
-
     }
     public float getCgpa(){
         return cgpa;
@@ -41,66 +56,138 @@ public class Student extends User implements View{
         return count > 0;
     }
 
-
-
     public void setSemester() {
         if(semester<=7){
         this.semester++;
             System.out.println("Semester updated successfully!");}
         else System.out.println("Student has Passed out of the college");
     }
-    public void register(List<Course> courses) {
-        int Tcredit=0;
-        for(Course c : registeredCourses) {
-            if(c.getSemester()==this.semester) Tcredit+=c.getCredit();
-        }
-        System.out.println("Enter the course code for registration:-");
-        String courseCode=scanner.nextLine();
-        for(Course c : courses){
-            if(c.getCode().equals(courseCode)) {
-                if(Tcredit+c.getCredit()<=20&&c.getEnrolledStudents().size()+1<=c.getEnrollmentLimit()){
-                    int pre_count=0;
-                   for(Course c1 : c.getPrerequisites()) {
-                       for(Course c2: this.registeredCourses){
-                           if(c1.getCode().equals(c2.getCode())&& grades_registeredCourses.get(registeredCourses.indexOf(c2))>4 ) {pre_count++;}
-                       }
-                   }
-                   if(pre_count==c.getPrerequisites().size()){
-                    this.registeredCourses.add(c);
-                    this.grades_registeredCourses.add(0);
-                    c.getEnrolledStudents().add(this);
-                       System.out.println("Course Successfully Registered!");
-                   }
-                   else{
-                       System.out.println("Prerequisites are not completed first complete them..");
+//    public void register(List<Course> courses) {
+//        int Tcredit=0;
+//        for(Course c : registeredCourses) {
+//            if(c.getSemester()==this.semester) Tcredit+=c.getCredit();
+//        }
+//        System.out.println("Enter the course code for registration:-");
+//        String courseCode=scanner.nextLine();
+//        for(Course c : courses){
+//            if(c.getCode().equals(courseCode)) {
+//                if(Tcredit+c.getCredit()<=20&&c.getEnrolledStudents().size()+1<=c.getEnrollmentLimit()){
+//                    int pre_count=0;
+//                   for(Course c1 : c.getPrerequisites()) {
+//                       for(Course c2: this.registeredCourses){
+//                           if(c1.getCode().equals(c2.getCode())&& grades_registeredCourses.get(registeredCourses.indexOf(c2))>4 ) {pre_count++;}
+//                       }
+//                   }
+//                   if(pre_count==c.getPrerequisites().size()){
+//                    this.registeredCourses.add(c);
+//                    this.grades_registeredCourses.add(0);
+//                    c.getEnrolledStudents().add(this);
+//                       System.out.println("Course Successfully Registered!");
+//                   }
+//                   else{
+//                       System.out.println("Prerequisites are not completed first complete them..");
+//                   }
+//                }
+//                else{
+//                    System.out.println("Course can't be registered...");
+//                }
+//                return;
+//            }
+//        }
+//    }
+public void register(List<Course> courses) throws CourseFullException {
+    int Tcredit = 0;
 
-                   }
+    // Calculate total credits for current semester
+    for(Course c : registeredCourses) {
+        if(c.getSemester() == this.semester) {
+            Tcredit += c.getCredit();
+        }
+    }
+
+    System.out.println("Enter the course code for registration:");
+    String courseCode = scanner.nextLine();
+
+    for(Course c : courses) {
+        if(c.getCode().equals(courseCode)) {
+            // Check if course enrollment is full
+            if(c.getEnrolledStudents().size() >= c.getEnrollmentLimit()) {
+                throw new CourseFullException("Course " + courseCode + " is already full.");
+            }
+
+            try {
+                // Check if total credits exceed the limit
+                if (Tcredit + c.getCredit() > 20) {
+                    throw new CreditLimitExceededException("Credit limit exceeded for this semester.");
                 }
-                else{
-                    System.out.println("Course can't be registered...");
+
+                int pre_count = 0;
+
+                // Check prerequisites
+                for(Course c1 : c.getPrerequisites()) {
+                    for(Course c2 : this.registeredCourses) {
+                        if(c1.getCode().equals(c2.getCode()) &&
+                                grades_registeredCourses.get(registeredCourses.indexOf(c2)) > 4) {
+                            pre_count++;
+                        }
+                    }
                 }
+
+                if(pre_count != c.getPrerequisites().size()) {
+                    throw new PrerequisitesNotMetException("Prerequisites not met for the course " + courseCode + ".");
+                }
+
+                // Successfully register the course
+                this.registeredCourses.add(c);
+                this.grades_registeredCourses.add(0);
+                c.getEnrolledStudents().add(this);
+                System.out.println("Course Successfully Registered!");
+
+            } catch (CreditLimitExceededException | PrerequisitesNotMetException e) {
+                System.out.println(e.getMessage());
+            }
+
+            return;
+        }
+    }
+
+    System.out.println("Course not found.");
+}
+
+//    public void drop_course(List<Course> courses){
+//        if(Course.getDrop()){
+//            String courseCode=scanner.nextLine();
+//            for(Course c : courses){
+//                if(c.getCode().equals(courseCode)) {
+//                    grades_registeredCourses.remove(registeredCourses.indexOf(c));
+//                    registeredCourses.remove(c);
+//                    System.out.println("Course is dropped...");
+//
+//                    return;
+//                }
+//            }
+//        }
+//        else{
+//            System.out.println("Course can't be dropped...");
+//        }
+//    }
+public void drop_course(List<Course> courses) throws DropDeadlinePassedException {
+    if (Course.getDrop()) {
+        System.out.println("Enter the course code to drop:");
+        String courseCode = scanner.nextLine();
+        for (Course c : courses) {
+            if (c.getCode().equals(courseCode)) {
+                grades_registeredCourses.remove(registeredCourses.indexOf(c));
+                registeredCourses.remove(c);
+                System.out.println("Course is dropped...");
                 return;
             }
         }
-
+        System.out.println("Course not found.");
+    } else {
+        throw new DropDeadlinePassedException("Cannot drop the course. The drop deadline has passed.");
     }
-    public void drop_course(List<Course> courses){
-        if(Course.getDrop()){
-            String courseCode=scanner.nextLine();
-            for(Course c : courses){
-                if(c.getCode().equals(courseCode)) {
-                    grades_registeredCourses.remove(registeredCourses.indexOf(c));
-                    registeredCourses.remove(c);
-                    System.out.println("Course is dropped...");
-
-                    return;
-                }
-            }
-        }
-        else{
-            System.out.println("Course can't be dropped...");
-        }
-    }
+}
     public void Academic_Progress(){
         int cg=0;
         int tcredit=0;
@@ -215,9 +302,24 @@ public class Student extends User implements View{
             System.out.println("-".repeat(20));
         }
     }
+    // Submit feedback for a course
+    public <T> void submitFeedback(String courseCode, T feedback) {
+        for(Course c : registeredCourses) {
+            if(Objects.equals(c.getCode(), courseCode)&&grades_registeredCourses.get(registeredCourses.indexOf(c))<5) {
+                System.out.println("You can't submit feedback for this course as you have not passed this course yet.");
+                return;
+            } else if (Objects.equals(c.getCode(), courseCode)) {
+                feedback<T> feedbackObj = new feedback<>(this.email, courseCode, feedback);
+                c.add_feedback(feedbackObj);
+                System.out.println("Feedback submitted successfully!");
+            }
+        }
+
+    }
+
 
     @Override
     public void displayMenu() {
-        System.out.println("1. View Available Courses\n2. Register for Course\n3. Drop Course\n4. Track Academic Progress\n5. Submit Complaint\n6. View Complaint Box\n7. Change Password\n8. Logout");
+        System.out.println("1. View Available Courses\n2. Register for Course\n3. Drop Course\n4. Track Academic Progress\n5. Course Feedback\n6. Submit Complaint\n7. View Complaint Box\n8. Change Password\n9. Logout");
     }
 }

@@ -50,7 +50,6 @@ public class Professor extends User implements View{
                 return;
 
             }}
-
     }
     public int getOfficeHour() {
         return this.OfficeHour;
@@ -58,8 +57,6 @@ public class Professor extends User implements View{
     public void setOfficeHour(int officeHour) {
         this.OfficeHour = officeHour;
     }
-
-
 
     @Override
     public void view_courses(List<Course> courses_list){
@@ -140,19 +137,16 @@ public class Professor extends User implements View{
         complaint.setMessage("We can't shift the course so You need to choose between one of them");
         complaint.setStatus("Resolved");
     }
-
     public void manageCourse(List<Course> courses_list) {
        while(true) {
-           System.out.println("1. To view the course\n2. To edit the details of the courses\n3.To edit the office hour\n4. Exit");
+           System.out.println("1. To view the course\n2. To edit the details of the courses\n3. To edit the office hour\n4. To view the past feedback about the course.\n5. Exit");
            Scanner scanner = new Scanner(System.in);
            int choice = scanner.nextInt();
            scanner.nextLine();
            if (choice == 1) {
                view_courses(courses_list);
-
            }
            else if (choice == 2) {
-
                for (Course course : courses_list) {
                    if (course.getCode().equals(this.assigned_courseCode)) {
                        while (true) {
@@ -184,7 +178,6 @@ public class Professor extends User implements View{
                                            course.getPrerequisites().add(pre_course);
                                            System.out.println("Prerequisite added");
                                        }
-
                                    }
                                } else if (pre_choice == 2) {
                                    System.out.println("Enter the course code for deleting the course:-");
@@ -205,7 +198,6 @@ public class Professor extends User implements View{
                                scanner.nextLine();
                                course.setEnrollmentLimit(limit);
                                System.out.println("New Enrollment Limit is set");
-
                            }
                            else if(c==6){
                                System.out.println("Enter the new Office Hour");
@@ -228,8 +220,14 @@ break;
                setOfficeHour(scanner.nextInt());
                scanner.nextLine();
                System.out.println("Office hour updated..");
-           }
-           else if (choice == 4) {
+           } else if (choice == 4) {
+               for (Course course : courses_list) {
+                   if (course.getCode().equals(this.assigned_courseCode)) {
+                       course.viewCourseFeedback();
+                   }
+               }
+
+           } else if (choice == 5) {
                        System.out.println("Exiting manage course section....");
                        break;
            }
@@ -239,7 +237,6 @@ break;
 
        }
     }
-
 
     @Override
     public void displayMenu() {
