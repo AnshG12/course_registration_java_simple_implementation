@@ -12,21 +12,13 @@ class PrerequisitesNotMetException extends Exception {
         super(message);
     }
 }
-class DropDeadlinePassedException extends Exception {
-    public DropDeadlinePassedException(String message) {
-        super(message);
-    }
-}
+
 public class Student extends User implements View{
     private int semester=1;
     private float cgpa;
     private final List<Course> registeredCourses;// we used final because no new instances or object would be made for them
     private final List<Integer> grades_registeredCourses;
     private final List<Complaint> registeredComplaints;
-
-
-
-
 
     public Student(String email, String password) {
         super(email, password);

@@ -4,16 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="38b3e632-a064-40d2-9859-1b8f28ec5665" name="Changes" comment="final">
-      <change afterPath="$PROJECT_DIR$/src/CourseFullException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/TeachingAssistant.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/feedback.java" afterDir="false" />
+    <list default="true" id="38b3e632-a064-40d2-9859-1b8f28ec5665" name="Changes" comment="bruh">
+      <change afterPath="$PROJECT_DIR$/src/DropDeadlinePassedException.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Course.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Course.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Professor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Professor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Student.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Student.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/TeachingAssistant.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/TeachingAssistant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/profANDstu.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -99,7 +98,8 @@
       <workItem from="1726800453086" duration="4017000" />
       <workItem from="1727611110717" duration="383000" />
       <workItem from="1727611554240" duration="289000" />
-      <workItem from="1727611864520" duration="16482000" />
+      <workItem from="1727611864520" duration="22179000" />
+      <workItem from="1727805235268" duration="5818000" />
     </task>
     <task id="LOCAL-00001" summary="structure">
       <option name="closed" value="true" />
@@ -133,7 +133,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726800513997</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="final">
+      <option name="closed" value="true" />
+      <created>1727756149595</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1727756149596</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -153,7 +161,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="structure" />
     <MESSAGE value="final" />
-    <option name="LAST_COMMIT_MESSAGE" value="final" />
+    <MESSAGE value="bruh" />
+    <option name="LAST_COMMIT_MESSAGE" value="bruh" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

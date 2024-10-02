@@ -9,47 +9,6 @@ public class Main {
         }
     }
     public static void main(String[] args) throws CourseFullException {
-//        Scanner scanner = new Scanner(System.in);
-//        List<Course> course_list = new ArrayList<Course>();
-//        List<Complaint> complaints = new ArrayList<Complaint>();
-//        List<Student> studentList = new ArrayList<Student>();
-//        List<Professor> professorList = new ArrayList<Professor>();
-//        List<Administrator> adminList = new ArrayList<Administrator>();
-//        List<List<Course>> Schedule= new ArrayList<>();
-//        while (true) {
-//            System.out.println("Welcome to the University Course Registration System");
-//            System.out.println("1. Login as Student\n2. Login as Professor\n3. Login as Administrator\n4. Exit");
-//            int choice = scanner.nextInt();
-//            scanner.nextLine();
-//// Student login and menu
-//            if (choice == 1) {
-//                Student student = loginAsStudent(scanner, studentList);
-//                if(student != null) {
-//                    studentMenu(student, course_list, complaints);
-//                }
-//            }
-//// Professor login and menu
-//            else if (choice == 2) {
-//                Professor professor = loginAsProfessor(scanner, professorList);
-//                if(professor != null) {
-//                    professorMenu(professor, course_list);
-//                }
-//            }
-//// Admin login and menu
-//            else if (choice == 3) {
-//                Administrator admin= loginAsAdministrator(scanner, adminList);
-//                adminMenu(admin, course_list, complaints, professorList,studentList,Schedule);
-//            }
-////EXIT
-//            else if (choice == 4) {
-//                System.out.println("Exiting the system. Goodbye!");
-//                break;
-//            }
-//            else{
-//                System.out.println("Please enter a valid choice");
-//            }
-//        }
-
             Scanner scanner = new Scanner(System.in);
             List<Course> course_list = new ArrayList<>();
             List<Complaint> complaints = new ArrayList<>();
@@ -57,9 +16,10 @@ public class Main {
             List<Professor> professorList = new ArrayList<>();
             List<Administrator> adminList = new ArrayList<>();
             List<List<Course>> Schedule = new ArrayList<>();
+            List<TeachingAssistant> taList = new ArrayList<>();
             while (true) {
                 System.out.println("Welcome to the University Course Registration System");
-                System.out.println("1. Login as Student\n2. Login as Professor\n3. Login as Administrator\n4. Exit");
+                System.out.println("1. Login as Student\n2. Login as Professor\n3. Login as Administrator\n4. Login as Teaching Assistant\n5. Exit");
                 int choice = scanner.nextInt();
                 scanner.nextLine();
                 try {
@@ -75,7 +35,12 @@ public class Main {
                     } else if (choice == 3) {
                         Administrator admin = loginAsAdministrator(scanner, adminList);
                         adminMenu(admin, course_list, complaints, professorList, studentList, Schedule);
-                    } else if (choice == 4) {
+                    }
+                    else if (choice == 4) {
+                        TeachingAssistant ta = loginAsTA(scanner, taList);
+                        taMenu(ta, course_list, complaints);
+                    }
+                    else if (choice == 5) {
                         System.out.println("Exiting the system. Goodbye!");
                         break;
                     } else {
@@ -220,6 +185,58 @@ private static Administrator loginAsAdministrator(Scanner scanner, List<Administ
     // Either prompt the user to register or throw an exception.
 
 }
+    private static TeachingAssistant loginAsTA(Scanner scanner, List<TeachingAssistant> taList) throws InvalidLoginException {
+        while (true) {
+            System.out.println("1. Log In\n2. Sign Up");
+            int logInChoice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            if (logInChoice == 1) {
+                // Log in logic
+                System.out.println("Enter your email: ");
+                String TAEmail = scanner.nextLine();
+                System.out.println("Enter your password: ");
+                String TAPassword = scanner.nextLine();
+
+                for (TeachingAssistant ta : taList) {
+                    if (ta.getEmail().equals(TAEmail) && ta.checkPassword(TAPassword)) {
+                        System.out.println("Login successful!");
+                        return ta;
+                    }
+                }
+
+                throw new InvalidLoginException("Invalid email or password. Please try again.");
+
+            } else if (logInChoice == 2) {
+                // Sign up logic
+                System.out.println("Enter your email to sign up: ");
+                String newTAEmail = scanner.nextLine();
+
+                boolean exists = false;
+                for (TeachingAssistant ta : taList) {
+                    if (ta.getEmail().equals(newTAEmail)) {
+                        exists = true;
+                        break; // Email already exists
+                    }
+                }
+
+                if (exists) {
+                    System.out.println("This email is already registered. Try logging in.");
+                } else {
+                    System.out.println("Create a password: ");
+                    String newTAPassword = scanner.nextLine();
+                    TeachingAssistant newTA = new TeachingAssistant(newTAEmail, newTAPassword);
+                    taList.add(newTA);
+                    System.out.println("Sign-up successful! You can now log in.");
+                    return newTA;
+                }
+
+            } else {
+                // Handle invalid choices
+                System.out.println("Invalid choice. Please enter 1 to log in or 2 to sign up.");
+            }
+        }
+    }
 
 
     private static void studentMenu(Student student, List<Course> courses, List<Complaint> complaints) throws CourseFullException, DropDeadlinePassedException {
@@ -365,5 +382,84 @@ private static Administrator loginAsAdministrator(Scanner scanner, List<Administ
         }
         else System.out.println("Invalid choice. Please select a valid number.");
       }
+    }
+    private static void taMenu(TeachingAssistant ta, List<Course> courses, List<Complaint> complaints) throws CourseFullException, DropDeadlinePassedException {
+        Scanner scanner = new Scanner(System.in);
+        boolean run=true;
+        while (run) {
+            ta.Menu();
+            System.out.println("Enter your choice:");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline left-over
+            switch (choice) {
+                case 1:
+                    System.out.println("Viewing Available Courses...");
+// Implement the method to view available courses
+                    ta.view_courses(courses);
+                    break;
+                case 2:
+                    System.out.println("Registration Page..");
+// Implement the method to register for a course
+                    ta.register(courses);
+                    break;
+                case 3:
+                    System.out.println("Dropping a Course...");
+// Implement the method to drop a course
+                    ta.drop_course(courses);
+                    break;
+                case 4:
+                    System.out.println("Tracking Academic Progress...");
+// Implement the method to track academic progress.Academic_Progress();
+                    break;
+                case 5:
+                    System.out.println("adding course feedback...");
+// Implement the method to add course feedback
+                    System.out.println("Enter course code for feedback: ");
+                    String courseCode = scanner.nextLine();
+
+                    System.out.println("Would you like to provide a rating (1-5) or a comment? (Enter 'rating' or 'comment')");
+                    String feedbackType = scanner.nextLine();
+
+                    if (feedbackType.equalsIgnoreCase("rating")) {
+                        System.out.println("Enter your rating (1-5): ");
+                        int rating = scanner.nextInt();
+                        ta.submitFeedback(courseCode, rating);
+
+                    } else if (feedbackType.equalsIgnoreCase("comment")) {
+                        System.out.println("Enter your comment: ");
+                        scanner.nextLine();  // consume the newline character
+                        String comment = scanner.nextLine();
+                        ta.submitFeedback(courseCode, comment);
+
+                    }break;
+                case 6:
+                    System.out.println("Assisting in Grading...");
+                    ta.assistGrading(courses);
+                    break;
+                case 7:
+                    System.out.println("Submitting a Complaint...");
+// Implement the method to submit a complaint
+                    ta.Submit_complaint(complaints,courses);
+                    break;
+                case 8:
+                    System.out.println("Viewing Complaint Box...");
+// Implement the method to view complaints
+                    ta.view_complaint_status();
+                    break;
+                case 9:
+                    System.out.println("Changing Password...\nEnter the new password below: ");
+// Implement the method to change password
+                    ta.setPassword(scanner.nextLine());
+                    break;
+                case 10:
+                    System.out.println("Logging Out...");
+                    run = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please select a valid number.");
+                    break;
+            }
+        }
+        System.out.println("You have successfully logged out. Have a good day!");
     }
 }

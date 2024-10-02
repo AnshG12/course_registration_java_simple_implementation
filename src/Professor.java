@@ -237,9 +237,40 @@ break;
 
        }
     }
+    public void assignCourseToTA(List<TeachingAssistant> taList,List<Student> stu) {
+        System.out.println("Enter Student roll no. who you want to make TA:");
+        String taEmail = scanner.nextLine();
+//
+//        if(roll>stu.size()){
+//            System.out.println("Invalid roll no. retry....");
+//            return;
+//        }
+//        else{
+//            try {
+//                Student student=stu.get(roll-1);
+//                TeachingAssistant newTA = (TeachingAssistant) student.clone();
+//                taList.add(newTA);
+//                System.out.println("TA assigned successfully.");
+//            } catch (CloneNotSupportedException e) {
+//                e.printStackTrace();
+//            }
+  //      }
+        boolean taFound = false;
+        for (TeachingAssistant ta : taList) {
+            if (ta.getEmail().equals(taEmail)) {
+                ta.setAssignedCourseCode(this.assigned_courseCode);
+                System.out.println("Assigned course " + this.assigned_courseCode + " to TA " + ta.getEmail());
+                taFound = true;
+                break;
+            }
+        }
+        if (!taFound) {
+            System.out.println("TA with email " + taEmail + " not found.");
+        }
 
+    }
     @Override
     public void displayMenu() {
-        System.out.println("1. View Enrolled Students\n2. Manage Course\n3. Grade the student\n4. Logout");
+        System.out.println("1. View Enrolled Students\n2. Manage Course\n3. Grade the student\n4. Assign TA\n5. Logout");
     }
 }
